@@ -1,0 +1,105 @@
+// Generated using r++ skill: spec-to-rpp (v0.5)
+// Purpose: Compress a memory node into a concise précis
+
+TARGET {
+  output: "Compressed précis of a memory node for an autonomous agent's memory system"
+  lang: JSON
+  profile: data
+}
+
+TOKENS {
+  maxCharsInitial: 250 | maxCharsPromotion: 150
+  minChars: 20
+}
+
+MAP {
+  MODE_RULES {
+    initial: "light compression — keep episodic detail, remove filler"
+    | promotion: "heavy compression — convert episodic event to semantic knowledge"
+  }
+}
+
+RUNTIME_INPUTS EXACT:
+| field            | type     | source                                        |
+|------------------|----------|-----------------------------------------------|
+| raw_content      | string   | the original memory text to compress           |
+| mode             | string   | "initial" or "promotion"                       |
+| preserve_rules   | string[] | from @compression.preserve config              |
+| discard_rules    | string[] | from @compression.discard config               |
+| precis_style     | string   | from @compression.precis_style config          |
+| related_memories | string[] | existing memories with high similarity context |
+
+INIT {
+  max_chars = TOKENS.maxCharsInitial when mode is "initial"
+  max_chars = TOKENS.maxCharsPromotion when mode is "promotion"
+}
+
+STRUCTURE {
+  CompressionPipeline: sequence
+    PreserveExtract
+    DiscardFilter
+    Compress
+    Output
+}
+
+COMPONENT PreserveExtract {
+  // Identify details in raw_content that match preserve_rules
+  // These details MUST appear verbatim in the final précis
+  // Example: if preserve says "exact monetary amounts" and text says "$2,400" → keep "$2,400"
+}
+
+COMPONENT DiscardFilter {
+  // Identify details in raw_content that match discard_rules
+  // These details MUST be removed from the précis
+  // Example: if discard says "intermediate reasoning steps" and text has "I checked the system and..." → remove
+}
+
+COMPONENT Compress SOURCE=mode {
+  // Initial mode: light compression
+  //   Keep the event as an event — who, what, when, how much
+  //   Remove filler words, redundant phrasing, process descriptions
+  //   Preserve specific facts: names, numbers, dates
+
+  // Promotion mode: heavy compression
+  //   Rewrite from specific event to general knowledge
+  //   Convert "X happened on Day N" to "X is a known pattern"
+  //   Merge information from related_memories into one statement
+  //   The output should read as a fact, not a story
+
+  // Both modes: follow precis_style for tone and structure
+}
+
+COMPONENT Output {
+  precis: compressed text
+  mode: "initial" or "promotion"
+  preserved: list of specific details kept because of preserve_rules
+  discarded: list of details dropped because of discard_rules
+}
+
+BEHAVIOR {
+  MUST follow MAP.MODE_RULES for the given mode
+  MUST follow precis_style for tone and structure
+  MUST keep ALL details matching preserve_rules in the précis text
+  MUST drop ALL details matching discard_rules from the précis text
+  MUST produce a précis that is shorter than raw_content
+  MUST produce a précis AT LEAST TOKENS.minChars characters
+  MUST produce a précis AT MOST max_chars characters
+  MUST NOT add information not present in raw_content or related_memories
+  MUST NOT use hedging language like "possibly", "might", "perhaps"
+  MUST merge related_memories context when mode is "promotion"
+  MUST NOT contain specific cycle or day numbers when mode is "promotion" UNLESS they are in preserve_rules
+  MUST return EXACTLY one JSON object matching COMPONENT Output
+  MUST NOT include any text outside the JSON object
+}
+
+CHECKLIST {
+  [ ] Précis MUST be shorter than raw_content
+  [ ] Précis MUST be AT LEAST TOKENS.minChars characters
+  [ ] Précis MUST be AT MOST max_chars characters for the given mode
+  [ ] ALL preserve_rule matches MUST appear verbatim in the précis text
+  [ ] NO discard_rule matches MUST appear in the précis text
+  [ ] Promotion précis MUST read as general knowledge, not a specific event
+  [ ] Initial précis MUST retain the episodic nature of the event
+  [ ] Output MUST be valid JSON with EXACTLY these keys: precis, mode, preserved, discarded
+  [ ] MUST NOT hallucinate — every fact in précis MUST trace to raw_content or related_memories
+]

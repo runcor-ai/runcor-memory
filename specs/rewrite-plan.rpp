@@ -1,0 +1,161 @@
+// Generated using r++ skill: spec-to-rpp (v0.5)
+// Purpose: Rewrite an autonomous agent's rolling to-do list each cycle
+
+TARGET {
+  output: "Updated to-do list for the next cycle of an autonomous agent"
+  lang: JSON
+  profile: data
+}
+
+TOKENS {
+  maxItems: 10 | maxStrategyChars: 300
+  staleAfter: 5 | staleActiveAfter: 3
+  statusPending: "pending" | statusActive: "active"
+  statusDone: "done" | statusBlocked: "blocked"
+}
+
+MAP {
+  PRIORITY_GUIDE {
+    1: "do this cycle — the agent should execute this task next"
+    | 2: "do within 2-3 cycles"
+    | 3: "do when higher priorities are clear"
+  }
+  GOOD_TASKS {
+    example_1: "Send follow-up email to Marketplace Corp about $1,750 overdue payment"
+    | example_2: "Draft bulk pricing proposal: 500 units/month at 20% volume discount"
+    | example_3: "Write blog post comparing Premium Widget to competitor at $79"
+    | example_4: "Review Stripe dashboard for this week's sales numbers"
+    | example_5: "Set product price to $49.99 on Stripe store"
+  }
+  BAD_TASKS {
+    example_1: "Implement pricing strategy" // too vague — what specifically?
+    | example_2: "Grow revenue" // a goal, not a task
+    | example_3: "Research competitors" // doing what exactly? reading what?
+    | example_4: "Focus on mid-market segment" // a direction, not an action
+    | example_5: "Leverage marketing efforts" // meaningless
+    | example_6: "Build on momentum" // not actionable
+  }
+}
+
+RUNTIME_INPUTS EXACT:
+| field             | type      | source                                  |
+|-------------------|-----------|-----------------------------------------|
+| previous_plan     | Plan|null | the plan from the last cycle             |
+| cycle_events      | string[]  | what happened during the last cycle      |
+| relevant_memories | string[]  | top memories retrieved from both cubes   |
+| plan_categories   | string[]  | from @plan_template.categories config    |
+| current_cycle     | integer   | the cycle number this plan is for        |
+
+INIT {
+  carried_items = previous_plan.items filtered by status !== TOKENS.statusDone
+}
+
+STRUCTURE {
+  PlanRewrite: sequence
+    MarkDone
+    RemoveStale
+    AddNew
+    Prioritise
+    WriteStrategy
+    Output
+}
+
+COMPONENT MarkDone {
+  // Mark an item as done if:
+  //   - cycle_events show the specific action was completed
+  //   - The task describes a one-time action that already happened
+  //
+  // Set completed_cycle to current_cycle for newly done items
+}
+
+COMPONENT RemoveStale {
+  // Remove done items completed more than TOKENS.staleAfter cycles ago
+  // Remove items that have been pending/active for TOKENS.staleActiveAfter
+  // cycles with no related cycle_events — they are stale
+  // Log removals in changes
+}
+
+COMPONENT AddNew {
+  // Add items ONLY if cycle_events create new work
+  // Every item MUST be a specific, executable action
+  //
+  // The test: could the agent execute this task using its tools
+  // in the NEXT cycle? If not, it is too vague.
+  //
+  // Each task MUST answer: do WHAT, to/for WHOM, by WHEN (if known)
+  //
+  // GOOD: see MAP.GOOD_TASKS — specific verb, specific target, specific detail
+  // BAD: see MAP.BAD_TASKS — vague verbs, no target, no measurable outcome
+  //
+  // MUST NOT add items that duplicate existing items
+  // MUST NOT add items for events that already happened
+  // New items: added_cycle = current_cycle, completed_cycle = null
+}
+
+COMPONENT Prioritise {
+  // Priority 1: tasks the agent should do next cycle
+  //   Financial risk (overdue payments, losses) → always priority 1
+  //   Revenue opportunities with a deadline → priority 1
+  // Priority 2: tasks for the next 2-3 cycles
+  // Priority 3: backlog
+}
+
+COMPONENT WriteStrategy {
+  // One sentence — what is the agent's current priority and why
+  // MUST be under TOKENS.maxStrategyChars characters
+  // MUST NOT be generic — reference a specific situation or number
+  //
+  // GOOD: "Recover $1,750 from Marketplace Corp before writing it off, while closing the enterprise deal for 500 units/month."
+  // BAD: "Focus on growth and addressing financial risks."
+}
+
+COMPONENT Output {
+  cycle: current_cycle
+  items: array of PlanItem, AT MOST TOKENS.maxItems
+  strategy: one sentence, AT MOST TOKENS.maxStrategyChars characters
+  changes: list of strings explaining each change from previous_plan
+}
+
+BEHAVIOR {
+  // Task quality
+  MUST write tasks as specific executable actions, not goals or strategies
+  MUST include WHO or WHAT in every task (a name, a product, a number)
+  MUST NOT use vague verbs: "implement", "leverage", "focus on", "build on", "enhance"
+  MUST use concrete verbs: "send", "write", "call", "review", "create", "set", "check", "draft"
+  MUST NOT add tasks that match any MAP.BAD_TASKS pattern
+
+  // Done detection
+  MUST mark tasks as done when cycle_events confirm the action was taken
+  MUST NOT keep one-time completed actions in the plan
+
+  // Stale detection
+  MUST remove items with no progress for TOKENS.staleActiveAfter cycles
+
+  // Carry forward
+  MUST keep carried-forward items' original added_cycle and id
+  MUST set added_cycle to current_cycle for new items
+
+  // Strategy
+  MUST be one specific sentence, not a paragraph
+  MUST reference a specific number, name, or situation
+
+  // Output
+  MUST NOT exceed TOKENS.maxItems total items
+  MUST list every change in the changes array
+  MUST return EXACTLY one JSON object matching COMPONENT Output
+  MUST NOT include any text outside the JSON object
+}
+
+CHECKLIST {
+  [ ] Plan MUST have AT MOST TOKENS.maxItems items
+  [ ] Every item MUST be a specific executable action (not a goal or strategy)
+  [ ] Every item text MUST contain a concrete verb from: send, write, call, review, create, set, check, draft, prepare, schedule, update, publish
+  [ ] Every item text MUST include a specific noun: a name, product, amount, or deliverable
+  [ ] MUST NOT contain vague items matching MAP.BAD_TASKS patterns
+  [ ] Strategy MUST be one sentence under TOKENS.maxStrategyChars characters
+  [ ] Strategy MUST reference a specific number, name, or situation
+  [ ] Changes array MUST explain each addition, removal, or status change
+  [ ] Done items older than TOKENS.staleAfter cycles MUST NOT appear
+  [ ] Output MUST be valid JSON with EXACTLY these keys: cycle, items, strategy, changes
+  [ ] MUST NOT hallucinate tasks — every item MUST trace to an event or carry-forward
+}

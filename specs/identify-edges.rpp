@@ -1,0 +1,91 @@
+// Generated using r++ skill: spec-to-rpp (v0.5)
+// Purpose: Identify typed relationships between memory nodes
+
+TARGET {
+  output: "JSON array of typed edges between a new memory and existing memories"
+  lang: JSON
+  profile: data
+}
+
+TOKENS {
+  maxEdges: 5
+  minConfidence: 0.6
+}
+
+MAP {
+  EDGE_TYPE {
+    caused: "A directly led to B happening — temporal + causal link"
+    | contradicts: "A and B cannot both be true — they conflict"
+    | preceded: "A happened before B — temporal sequence, no causal claim"
+    | reinforced: "A and B say the same thing in different words"
+    | related: "A and B share a topic but no specific relationship"
+  }
+  EDGE_EXAMPLES {
+    caused: "'Missed payment on Day 12' → caused → 'Declared bankruptcy on Day 30'"
+    | contradicts: "'Revenue is growing steadily' contradicts 'Sales have stalled this month'"
+    | preceded: "'Launched product on Day 4' preceded 'First sale on Day 5'"
+    | reinforced: "'Revenue: $5,000 growth trend' reinforced 'Revenue: $8,200 growth trend'"
+  }
+}
+
+RUNTIME_INPUTS EXACT:
+| field             | type     | source                              |
+|-------------------|----------|-------------------------------------|
+| new_memory        | string   | the newly recorded memory content   |
+| existing_memories | object[] | id + content of nearby memories     |
+
+STRUCTURE {
+  EdgeIdentifier: sequence
+    CompareEach
+    FilterByConfidence
+    Output
+}
+
+COMPONENT CompareEach {
+  // For each existing memory, determine:
+  //   1. Is there a meaningful relationship beyond topic similarity?
+  //   2. What type from MAP.EDGE_TYPE best describes it?
+  //   3. How confident are you? (0-1)
+  //
+  // Only identify edges where the relationship is SPECIFIC:
+  //   - "caused" requires a clear causal mechanism
+  //   - "contradicts" requires direct conflict, not just different topics
+  //   - "preceded" requires temporal ordering evidence in the text
+  //   - "reinforced" requires the same fact stated differently
+  //   - "related" is the fallback — use sparingly
+}
+
+COMPONENT FilterByConfidence {
+  // Drop any edge with confidence below TOKENS.minConfidence
+  // Keep at most TOKENS.maxEdges edges
+  // Prefer specific types (caused, contradicts) over generic (related)
+}
+
+COMPONENT Output {
+  edges: array of { to_id, type, weight, reason }
+}
+
+BEHAVIOR {
+  MUST compare new_memory against each existing_memory
+  MUST assign the most specific edge type that applies
+  MUST NOT assign "caused" unless there is clear causal evidence in the text
+  MUST NOT assign "contradicts" unless the facts directly conflict
+  MUST NOT assign "related" if a more specific type fits
+  MUST NOT create more than TOKENS.maxEdges edges
+  MUST NOT create edges with confidence below TOKENS.minConfidence
+  MUST provide a one-sentence reason for each edge
+  MUST return EXACTLY one JSON object with an "edges" array
+  MUST NOT include any text outside the JSON object
+}
+
+CHECKLIST {
+  [ ] Every edge MUST have: to_id, type, weight (0-1), reason
+  [ ] type MUST be one of: caused, contradicts, preceded, reinforced, related
+  [ ] weight MUST be between TOKENS.minConfidence and 1.0
+  [ ] Reason MUST be one sentence explaining the relationship
+  [ ] At most TOKENS.maxEdges edges returned
+  [ ] "caused" edges MUST cite causal evidence from the text
+  [ ] "contradicts" edges MUST cite the specific conflict
+  [ ] Output MUST be valid JSON with EXACTLY one key: edges
+  [ ] MUST NOT hallucinate relationships — every edge MUST be supported by text content
+}

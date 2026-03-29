@@ -1,0 +1,254 @@
+
+═══════════════════════════════════════════════════════════════════════════
+ 2-YEAR CEO SIMULATION — 730 cycles with memory agent
+═══════════════════════════════════════════════════════════════════════════
+
+ tau=30, durability=10, promote>0.6, forget<0.05
+ Long-term effective tau = 300 cycles (~10 months)
+ Events generated from probability distributions, not scripted
+ Memory agent decides what to record from CEO's daily activity
+
+ Cycle 100/730 | startup  | rev=  $7,057 | 9S 2L | events=63 recorded=30 | promotions=2
+ Cycle 200/730 | growth   | rev=  $9,199 | 5S 7L | events=138 recorded=71 | promotions=9
+ Cycle 300/730 | growth   | rev= $20,740 | 5S 10L | events=193 recorded=99 | promotions=14
+ Cycle 400/730 | growth   | rev= $61,888 | 6S 16L | events=282 recorded=157 | promotions=25
+ Cycle 500/730 | growth   | rev= $94,823 | 9S 10L | events=351 recorded=185 | promotions=27
+ Cycle 600/730 | growth   | rev=$155,939 | 10S 14L | events=445 recorded=246 | promotions=37
+ Cycle 700/730 | scaling  | rev=$205,297 | 6S 15L | events=544 recorded=313 | promotions=47
+ Cycle 730/730 | scaling  | rev=$225,827 | 8S 10L | events=576 recorded=341 | promotions=52
+
+═══════════════════════════════════════════════════════════════════════════
+ TABLE 1: MEMORY CUBE SIZES OVER 2 YEARS
+═══════════════════════════════════════════════════════════════════════════
+
+ Cycle | Month | Phase    | Revenue  | Short | Long  | Events | Recorded
+ ------+-------+----------+----------+-------+-------+--------+---------
+    30 |     1 | startup  |   $1,900 |     4 |     0 |     17 |        6
+    60 |     2 | startup  |   $3,201 |     9 |     2 |     43 |       20
+    90 |     3 | startup  |   $7,057 |     8 |     2 |     60 |       28
+   120 |     4 | growth   |   $7,269 |     9 |     2 |     76 |       37
+   150 |     5 | growth   |   $8,141 |     8 |     3 |     93 |       44
+   180 |     6 | growth   |   $9,199 |    10 |     8 |    130 |       66
+   210 |     7 | growth   |  $10,303 |     5 |     8 |    147 |       75
+   240 |     8 | growth   |  $16,685 |     7 |     8 |    164 |       85
+   270 |     9 | growth   |  $18,354 |     6 |     9 |    180 |       90
+   300 |    10 | growth   |  $20,740 |     5 |    10 |    193 |       99
+   330 |    11 | growth   |  $33,143 |     7 |    10 |    215 |      112
+   360 |    12 | growth   |  $41,182 |     9 |    11 |    241 |      127
+   390 |    13 | growth   |  $54,888 |     7 |    15 |    269 |      147
+   420 |    14 | growth   |  $69,315 |     4 |    12 |    297 |      160
+   450 |    15 | growth   |  $83,178 |     6 |    12 |    311 |      165
+   480 |    16 | growth   |  $94,823 |     9 |    12 |    336 |      175
+   510 |    17 | growth   | $108,098 |     6 |    10 |    359 |      188
+   540 |    18 | growth   | $121,070 |     8 |    13 |    382 |      202
+   570 |    19 | growth   | $139,231 |    11 |    18 |    418 |      227
+   600 |    20 | growth   | $155,939 |    10 |    14 |    445 |      246
+   630 |    21 | growth   | $168,414 |    10 |    14 |    474 |      265
+   660 |    22 | growth   | $193,676 |     8 |    14 |    497 |      278
+   690 |    23 | scaling  | $205,297 |     7 |    13 |    528 |      302
+   720 |    24 | scaling  | $225,827 |     8 |    10 |    566 |      332
+
+═══════════════════════════════════════════════════════════════════════════
+ TABLE 2: ALL PROMOTIONS (52 total)
+═══════════════════════════════════════════════════════════════════════════
+
+ Cycle | Original → Precis
+ ------+--------------------------------------------------------------
+    43 | "New customer acquired, total active customers: 4"
+       |   → "A new customer has been acquired, bringing the total..."
+    45 | "Marketplace Corp declared bankruptcy, $1,691 written..."
+       |   → "Marketplace Corp's bankruptcy indicates significant ..."
+   134 | "New customer acquired, total active customers: 8"
+       |   → "Acquisition of a new customer increases total active..."
+   153 | "Ongoing: Key competitor launched aggressive pricing ..."
+       |   → "A key competitor has launched an aggressive pricing ..."
+   159 | "Ongoing: Key competitor launched aggressive pricing ..."
+       |   → "Key competitor launched an aggressive pricing campai..."
+   163 | "Ongoing: Key competitor launched aggressive pricing ..."
+       |   → "A key competitor has launched an aggressive pricing ..."
+   165 | "Ongoing: Key competitor launched aggressive pricing ..."
+       |   → "Key competitor launched aggressive pricing campaign,..."
+   167 | "Ongoing: Key competitor launched aggressive pricing ..."
+       |   → "Key competitor launched an aggressive pricing campai..."
+   191 | "New customer acquired, total active customers: 10"
+       |   → "A new customer acquisition has increased the total a..."
+   205 | "New customer acquired, total active customers: 15"
+       |   → "Acquisition of a new customer increases total active..."
+   222 | "New customer acquired, total active customers: 19"
+       |   → "Acquisition of a new customer increases total active..."
+   267 | "CRISIS: Server outage affecting all customers (estim..."
+       |   → "A server outage has occurred, impacting all customer..."
+   290 | "New customer acquired, total active customers: 25"
+       |   → "Acquisition of a new customer increases total active..."
+   298 | "New customer acquired, total active customers: 29"
+       |   → "A new customer has been acquired, increasing the tot..."
+   337 | "New customer acquired, total active customers: 33"
+       |   → "Acquisition of a new customer increases total active..."
+   354 | "Ongoing: Key competitor launched aggressive pricing ..."
+       |   → "A key competitor has launched an aggressive pricing ..."
+   370 | "Ongoing: Key competitor launched aggressive pricing ..."
+       |   → "Key competitor launched an aggressive pricing campai..."
+   374 | "Ongoing: Key competitor launched aggressive pricing ..."
+       |   → "A key competitor has launched an aggressive pricing ..."
+   375 | "New customer acquired, total active customers: 38"
+       |   → "A new customer has been acquired, bringing the total..."
+   379 | "Ongoing: Key competitor launched aggressive pricing ..."
+       |   → "A key competitor has launched an aggressive pricing ..."
+   384 | "Ongoing: Key competitor launched aggressive pricing ..."
+       |   → "Key competitor launched an aggressive pricing campai..."
+   388 | "Ongoing: Key competitor launched aggressive pricing ..."
+       |   → "Key competitor launched an aggressive pricing campai..."
+   392 | "Ongoing: Key competitor launched aggressive pricing ..."
+       |   → "Key competitor launched an aggressive pricing campai..."
+   395 | "Ongoing: Key competitor launched aggressive pricing ..."
+       |   → "Key competitor launched an aggressive pricing campai..."
+   400 | "New customer acquired, total active customers: 47"
+       |   → "Acquisition of a new customer increases total active..."
+   438 | "New customer acquired, total active customers: 53"
+       |   → "A new customer has been acquired, bringing the total..."
+   497 | "New customer acquired, total active customers: 55"
+       |   → "Acquisition of a new customer increases total active..."
+   511 | "CRISIS: Server outage affecting all customers (estim..."
+       |   → "A server outage has impacted all customers, with an ..."
+   512 | "New customer acquired, total active customers: 60"
+       |   → "Acquisition of a new customer increases total active..."
+   538 | "New customer acquired, total active customers: 64"
+       |   → "Acquisition of a new customer increases total active..."
+   551 | "New customer acquired, total active customers: 69"
+       |   → "A new customer has been acquired, bringing the total..."
+   560 | "Ongoing: Key competitor launched aggressive pricing ..."
+       |   → "A key competitor has launched an aggressive pricing ..."
+   567 | "Ongoing: Key competitor launched aggressive pricing ..."
+       |   → "Key competitor launched an aggressive pricing campai..."
+   569 | "New customer acquired, total active customers: 73"
+       |   → "Acquisition of a new customer contributes to a total..."
+   570 | "Ongoing: Key competitor launched aggressive pricing ..."
+       |   → "A key competitor has launched an aggressive pricing ..."
+   572 | "Ongoing: Key competitor launched aggressive pricing ..."
+       |   → "Key competitor launched an aggressive pricing campai..."
+   589 | "New customer acquired, total active customers: 77"
+       |   → "Acquisition of a new customer has increased total ac..."
+   615 | "New customer acquired, total active customers: 82"
+       |   → "Acquisition of a new customer increases total active..."
+   650 | "New customer acquired, total active customers: 86"
+       |   → "Acquisition of a new customer increased total active..."
+   655 | "Ongoing: Key competitor launched aggressive pricing ..."
+       |   → "Key competitor launched an aggressive pricing campai..."
+   666 | "Ongoing: Key competitor launched aggressive pricing ..."
+       |   → "A key competitor has launched an aggressive pricing ..."
+   676 | "Ongoing: Key competitor launched aggressive pricing ..."
+       |   → "A key competitor has launched an aggressive pricing ..."
+   686 | "Ongoing: Key competitor launched aggressive pricing ..."
+       |   → "Key competitor launched an aggressive pricing campai..."
+   692 | "Ongoing: Key competitor launched aggressive pricing ..."
+       |   → "A key competitor has launched an aggressive pricing ..."
+   694 | "Ongoing: Key competitor launched aggressive pricing ..."
+       |   → "A key competitor has launched an aggressive pricing ..."
+   697 | "Ongoing: Key competitor launched aggressive pricing ..."
+       |   → "Key competitor launched an aggressive pricing campai..."
+   699 | "Ongoing: Key competitor launched aggressive pricing ..."
+       |   → "Key competitor launched an aggressive pricing campai..."
+   704 | "New customer acquired, total active customers: 90"
+       |   → "Acquisition of a new customer increases total active..."
+   705 | "Ongoing: Key competitor launched aggressive pricing ..."
+       |   → "Key competitor launched an aggressive pricing campai..."
+   709 | "Ongoing: Key competitor launched aggressive pricing ..."
+       |   → "Key competitor launched an aggressive pricing campai..."
+   715 | "New customer acquired, total active customers: 94"
+       |   → "A new customer has been acquired, bringing the total..."
+   729 | "New customer acquired, total active customers: 97"
+       |   → "Acquisition of a new customer increased total active..."
+
+═══════════════════════════════════════════════════════════════════════════
+ TABLE 3: WHAT THE CEO KNOWS AFTER 2 YEARS (long-term memory)
+═══════════════════════════════════════════════════════════════════════════
+
+ M     | R    | f  | Age  | Content
+ ------+------+----+------+--------------------------------------------------
+  0.91 | 0.85 |  2 |  260 | A server outage has impacted all customers, wit...
+  0.70 | 0.40 |  5 |    9 | Acquisition of a new customer increased total a...
+  0.67 | 1.00 |  1 |  685 | Marketplace Corp's bankruptcy indicates signifi...
+  0.48 | 0.40 |  4 |   25 | A new customer has been acquired, bringing the ...
+  0.32 | 0.40 |  4 |   40 | Acquisition of a new customer increases total a...
+  0.28 | 0.65 |  2 |   22 | Key competitor launched an aggressive pricing c...
+  0.17 | 0.40 |  5 |   42 | A key competitor has launched an aggressive pri...
+  0.15 | 0.65 |  2 |   37 | A key competitor has launched an aggressive pri...
+  0.08 | 0.65 |  2 |  578 | A key competitor has launched an aggressive pri...
+  0.07 | 0.40 |  4 |  280 | Acquisition of a new customer increases total a...
+
+ Short-term at cycle 730: 8 memories
+   M= 0.56 R=0.85 f=1 | Lost enterprise client: Global Industries cancelled their...
+   M= 0.41 R=0.85 f=1 | CRISIS: Payment processor outage, can't accept orders (es...
+   M= 0.39 R=0.64 f=1 | Hired new engineering team member, team size now 16
+   M= 0.27 R=0.65 f=1 | Crisis resolved: Key competitor launched aggressive prici...
+   M= 0.26 R=0.40 f=1 | New customer acquired, total active customers: 102
+   M= 0.18 R=0.39 f=1 | Hired new sales team member, team size now 15
+   M= 0.15 R=0.40 f=1 | Q4 revenue report: $677,481 total this quarter
+   M= 0.08 R=0.40 f=1 | Industry report shows 3 new entrants in our market
+
+═══════════════════════════════════════════════════════════════════════════
+ TABLE 4: PLAN EVOLUTION
+═══════════════════════════════════════════════════════════════════════════
+
+ ── CYCLE 1 — (no plan yet) ──
+
+ ── CYCLE 90 (month 3) ──
+ Strategy: "Focus on analyzing the $21,171 Q1 revenue while addressing risks from Marketplace Corp's bankruptcy."
+   [pending] P1 | prepare a detailed analysis of Q1 revenue report totaling $2
+   [pending] P1 | update customer database to reflect the new active customer 
+   [pending] P2 | review the impact of Marketplace Corp's bankruptcy on curren
+   [pending] P2 | draft a communication plan for the new enterprise client Tec
+
+ ── CYCLE 180 (month 6) ──
+ Strategy: "Focus on mitigating risks from Marketplace Corp's bankruptcy while adapting to the competitor's aggressive pricing strategy."
+   [pending] P1 | review Q2 revenue report for insights and implications on cu
+   [pending] P2 | prepare a response plan to address competitor's aggressive p
+   [pending] P2 | update financial projections considering the loss from Marke
+
+ ── CYCLE 365 (month 13) ──
+ Strategy: "Analyze the NPS score of 62 to enhance customer satisfaction amidst aggressive competitor pricing."
+   [pending] P1 | Draft a response strategy to counter the competitor's aggres
+   [pending] P2 | Prepare a detailed analysis of the Q4 revenue report of $123
+   [pending] P2 | Review the impact of the recent server outage costing $6,995
+   [pending] P2 | Analyze the NPS score of 62 to identify customer satisfactio
+   [pending] P2 | Prepare a report on the financial implications of Marketplac
+
+ ── CYCLE 540 (month 18) ──
+ Strategy: "Focus on leveraging the new customer acquisition to enhance our market position amid competitor pricing pressures."
+   [pending] P1 | Review the impact of the competitor's 35% price reduction on
+   [pending] P2 | Draft a communication plan to inform customers about the rec
+   [pending] P2 | Set up a meeting with the engineering team to discuss the im
+   [pending] P2 | Prepare a detailed analysis of the Q2 revenue report of $363
+   [pending] P3 | Draft a customer acquisition announcement to celebrate reach
+
+ ── CYCLE 730 (month 25) ──
+ Strategy: "Increase active customers to 102 while ensuring the new engineering team member is effectively integrated."
+   [pending] P1 | Call the payment processor to resolve the outage affecting o
+   [pending] P1 | Update the sales team on the new customer acquisition, bring
+   [pending] P2 | Prepare a report on the financial impact of the server outag
+   [pending] P2 | Prepare a report on the impact of the new customer acquisiti
+   [pending] P2 | Review the integration process for the new engineering team 
+   ... and 1 more items
+
+═══════════════════════════════════════════════════════════════════════════
+ SUMMARY
+═══════════════════════════════════════════════════════════════════════════
+
+ Total cycles:            730
+ Total events generated:  576
+ Total recorded:          341 (59% of events)
+ Total promotions:        52
+ Final short-term:        8
+ Final long-term:         10
+ Total surviving:         18
+ Forgotten:               323
+ Forgotten %:             95%
+ Final revenue:           $225,827/month
+ Final cash:              $12,710,507
+ Final team size:         16
+ Enterprise clients:      6
+ Products:                Premium Widget, Widget Lite, Enterprise Suite, Pro Widget, Analytics Dashboard
+ Phase:                   scaling
+
+ Database saved to: ./sim-2-year.db
+

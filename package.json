@@ -1,0 +1,52 @@
+{
+  "name": "runcor-memory",
+  "version": "0.1.0",
+  "description": "Long chain memory for autonomous AI agents",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "homepage": "https://runcor.ai/memory/",
+  "engines": {
+    "node": ">=20.6.0"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "tsx tests/test-formula.ts && tsx tests/test-config.ts",
+    "test:cube": "tsx --env-file=.env tests/test-cube.ts",
+    "test:llm": "tsx --env-file=.env tests/test-llm.ts",
+    "test:edges": "tsx --env-file=.env tests/test-edges.ts",
+    "sim:100": "tsx --env-file=.env tests/sim-100-cycles.ts",
+    "sim:tau": "tsx --env-file=.env tests/sim-tau-compare.ts",
+    "sim:tau:llm": "tsx --env-file=.env tests/sim-tau-llm.ts",
+    "sim:personas": "tsx --env-file=.env tests/sim-personas.ts",
+    "sim:cubes": "tsx --env-file=.env tests/sim-both-cubes.ts",
+    "sim:threshold": "tsx --env-file=.env tests/sim-threshold-compare.ts",
+    "sim:plan": "tsx --env-file=.env tests/sim-plan.ts",
+    "sim:2year": "tsx --env-file=.env tests/sim-2-year.ts"
+  },
+  "keywords": [
+    "runcor",
+    "memory",
+    "ai",
+    "agents",
+    "autonomous",
+    "long-chain-memory"
+  ],
+  "license": "MIT",
+  "author": "runcor <hello@runcor.ai>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/runcor-ai/runcor-memory"
+  },
+  "dependencies": {
+    "better-sqlite3": "^12.6.2",
+    "openai": "^6.25.0"
+  },
+  "devDependencies": {
+    "@anthropic-ai/sdk": "^0.80.0",
+    "@types/better-sqlite3": "^7.6.13",
+    "@types/node": "^25.3.2",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  }
+}

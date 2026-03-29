@@ -1,0 +1,74 @@
+# ══════════════════════════════════════════════════════════════
+# runcor-memory configuration
+# ══════════════════════════════════════════════════════════════
+#
+# This file configures how an agent remembers and forgets.
+# Place it alongside your project, or pass the path explicitly.
+#
+# Three ways to configure (in priority order):
+#   1. Pass config object in code     → highest priority
+#   2. This YAML file (memory.yaml)   → middle priority
+#   3. @memory block in .rpp spec     → lowest priority
+#   4. Built-in defaults              → fallback
+#
+
+# ── Core formula parameters ──────────────────────────────────
+
+# tau — Base half-life in cycles.
+# Controls how fast memories decay when not accessed or reinforced.
+#
+#   tau=10  → Goldfish. Forgets in ~2 weeks. Only reinforced patterns survive.
+#   tau=20  → Standard. Remembers recent weeks, forgets last month.
+#   tau=40  → Elephant. Holds context for over a month.
+#   tau=80  → Archivist. Almost nothing forgotten within 100 cycles.
+#
+# Pick based on the agent's role:
+#   Social media manager → 10
+#   CEO / daily operator → 20-30
+#   Project manager      → 40
+#   Lawyer / compliance  → 80-90
+tau: 30
+
+# durability — Long-term memory decay multiplier.
+# Long-term memories use tau * durability as their half-life.
+# Higher = long-term memories last much longer than short-term.
+durability: 5
+
+# promote_threshold — M value above which a short-term memory
+# gets flagged for promotion to long-term storage.
+# Higher = harder to promote, fewer long-term memories.
+promote_threshold: 1.5
+
+# forget_threshold — M value below which a short-term memory
+# is deleted (forgotten).
+# Lower = more tolerant, keeps weak memories longer.
+# Higher = aggressive cleanup, leaner context.
+forget_threshold: 0.05
+
+# ── Compression rules ────────────────────────────────────────
+# These guide the LLM when it compresses memories.
+
+compression:
+  # What details must be preserved word-for-word
+  preserve:
+    - "exact monetary amounts"
+    - "counterparty and client names"
+    - "dates and deadlines"
+    - "commitments and promises made"
+
+  # What can be safely dropped
+  discard:
+    - "routine daily greetings"
+    - "intermediate reasoning steps"
+    - "process descriptions that haven't changed"
+
+  # How the LLM should write compressed summaries
+  precis_style: "business summary — lead with impact, include numbers"
+
+# ── Plan template ─────────────────────────────────────────────
+# Configures the agent's rolling plan.
+
+plan_template:
+  categories: [strategy, operations, risk, growth]
+  max_items: 10
+  review_frequency: 1  # rewrite every N cycles

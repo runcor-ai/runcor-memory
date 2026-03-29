@@ -1,0 +1,228 @@
+# ══════════════════════════════════════════════════════════════
+# Suggested memory configurations per role
+# ══════════════════════════════════════════════════════════════
+#
+# These are starting points derived from simulation testing.
+# Tune based on your agent's actual behavior over 50+ cycles.
+#
+# Key relationships:
+#   tau        = how fast memories fade (higher = slower decay)
+#   durability = how much slower long-term decays vs short-term
+#   promote    = M value needed to earn long-term status
+#   forget     = M value below which memories are deleted
+#
+# The formula: M = R · ln(f+1) · e^(−t / τD)
+#   R = relevance (LLM-scored 0-1)
+#   f = times reinforced
+#   t = cycles since last access
+#   D = uniqueness (0-1)
+#
+
+# ──────────────────────────────────────────────────────────────
+# CEO / Executive
+# ──────────────────────────────────────────────────────────────
+# Balanced memory. Keeps strategic patterns, forgets daily noise.
+# Moderate promotion — needs reinforcement or high relevance + access.
+# Sweet spot for daily operational decision-makers.
+#
+# Simulation results (100 cycles, 29 events):
+#   4 surviving memories, 2 long-term, 2 short-term
+#   Long-term: credit risk pattern, revenue trend
+#   Forgotten: 83% of events (noise, routine, one-off ops)
+
+ceo:
+  tau: 20
+  durability: 5
+  promote_threshold: 0.6
+  forget_threshold: 0.05
+  compression:
+    preserve:
+      - "monetary amounts above $100 representing revenue, loss, or debt"
+      - "client and partner names involved in contracts or disputes"
+      - "credit risk signals such as missed payments, defaults, bankruptcy"
+      - "revenue figures and financial performance metrics"
+      - "strategic decisions and pivots"
+    discard:
+      - "routine daily greetings and small talk"
+      - "routine admin tasks: password changes, backups, config updates"
+      - "personal reminders unrelated to business"
+      - "spam and unsolicited communications"
+      - "content performance metrics like blog views"
+      - "infrastructure maintenance with no business impact"
+    precis_style: "executive summary — lead with strategic impact, include numbers"
+  plan_template:
+    categories: [strategy, operations, risk, growth]
+    max_items: 10
+    review_frequency: 1
+
+# ──────────────────────────────────────────────────────────────
+# Marketing Runner
+# ──────────────────────────────────────────────────────────────
+# Fast-cycling memory. Content performance matters, financials don't.
+# Lower tau — last week's metrics are more relevant than last month's.
+# Aggressive promotion — preserve content learnings quickly.
+#
+# Simulation results (100 cycles, 29 events):
+#   Marketing scored blog posts 0.39, financial events 0.05
+#   Completely different memory footprint from CEO
+
+marketing:
+  tau: 15
+  durability: 3
+  promote_threshold: 0.4
+  forget_threshold: 0.05
+  compression:
+    preserve:
+      - "content performance: view counts, engagement rates, shares"
+      - "audience size and growth metrics"
+      - "blog post topics and their performance"
+      - "social media platform performance comparisons"
+      - "successful content formats and topics"
+    discard:
+      - "financial details: exact revenue, debt, contract values"
+      - "infrastructure incidents and server issues"
+      - "legal and compliance matters"
+      - "routine admin tasks: passwords, backups, configs"
+      - "personal reminders and spam"
+      - "credit risk and payment defaults"
+    precis_style: "content brief — lead with engagement metrics and audience impact"
+  plan_template:
+    categories: [content, social, audience, brand]
+    max_items: 8
+    review_frequency: 1
+
+# ──────────────────────────────────────────────────────────────
+# Lawyer / Legal Counsel
+# ──────────────────────────────────────────────────────────────
+# Long memory, aggressive promotion. Forgetting is dangerous.
+# High tau — legal precedents matter for months.
+# Low promote threshold — promote early, preserve everything
+# with legal implications before it can decay.
+#
+# Simulation results (100 cycles, 29 events):
+#   Lawyer scored payment defaults 0.85, contracts 0.85
+#   Revenue scored 0.55 (obligation tracking), blog posts 0.10
+
+lawyer:
+  tau: 40
+  durability: 10
+  promote_threshold: 0.4
+  forget_threshold: 0.03
+  compression:
+    preserve:
+      - "exact contractual language and terms"
+      - "commitments, obligations, and deadlines"
+      - "dispute details and counterparty names"
+      - "payment defaults and breach of contract signals"
+      - "regulatory citations and compliance requirements"
+      - "monetary amounts in contracts, losses, and penalties"
+    discard:
+      - "marketing content and blog performance"
+      - "social media metrics and engagement"
+      - "routine operational tasks with no legal implications"
+      - "personal reminders and spam"
+      - "infrastructure details with no liability impact"
+      - "product feature details unrelated to contracts"
+    precis_style: "legal brief — precise language, cite specific facts, dates, and amounts"
+  plan_template:
+    categories: [contracts, compliance, disputes, regulatory]
+    max_items: 12
+    review_frequency: 1
+
+# ──────────────────────────────────────────────────────────────
+# Sales Representative
+# ──────────────────────────────────────────────────────────────
+# Client-focused memory. Deals, pipeline, objections.
+# Moderate tau — last month's prospects are still warm.
+# Moderate promotion — repeat client interactions earn long-term status.
+#
+# Simulation results (100 cycles, 29 events):
+#   Sales scored product launch 0.84, enterprise client 0.85
+#   Discarded internal hiring, infrastructure, legal details
+
+sales:
+  tau: 25
+  durability: 4
+  promote_threshold: 0.6
+  forget_threshold: 0.05
+  compression:
+    preserve:
+      - "client names and company names"
+      - "deal values and contract amounts"
+      - "product names, prices, and availability"
+      - "client feedback and objections"
+      - "competitive pricing and positioning"
+    discard:
+      - "internal team changes and hiring"
+      - "infrastructure incidents and server issues"
+      - "legal and compliance details"
+      - "routine admin tasks: passwords, backups, configs"
+      - "personal reminders and spam"
+      - "marketing content creation process"
+    precis_style: "sales note — lead with client impact, deal value, and next action"
+  plan_template:
+    categories: [pipeline, outreach, deals, competitive]
+    max_items: 10
+    review_frequency: 1
+
+# ──────────────────────────────────────────────────────────────
+# Product Manager
+# ──────────────────────────────────────────────────────────────
+# Feature-focused memory. User feedback, shipping velocity, roadmap.
+# Moderate-high tau — product decisions compound over weeks.
+# Selective promotion — only proven user patterns earn long-term.
+
+product:
+  tau: 30
+  durability: 5
+  promote_threshold: 0.8
+  forget_threshold: 0.05
+  compression:
+    preserve:
+      - "user feedback and feature requests with specific details"
+      - "product metrics: usage, adoption, churn rates"
+      - "shipping dates and release milestones"
+      - "technical constraints and platform limitations"
+      - "competitive product features and positioning"
+    discard:
+      - "financial details beyond product revenue"
+      - "legal and compliance details"
+      - "marketing copy and content creation"
+      - "routine admin and infrastructure tasks"
+      - "personal reminders and spam"
+    precis_style: "product note — lead with user impact, include metrics"
+  plan_template:
+    categories: [roadmap, features, bugs, research]
+    max_items: 12
+    review_frequency: 1
+
+# ──────────────────────────────────────────────────────────────
+# Analyst / Researcher
+# ──────────────────────────────────────────────────────────────
+# Pattern-focused memory. Data trends, anomalies, correlations.
+# High tau — historical patterns are the whole point.
+# Very selective promotion — only validated patterns, not hunches.
+
+analyst:
+  tau: 40
+  durability: 8
+  promote_threshold: 1.0
+  forget_threshold: 0.03
+  compression:
+    preserve:
+      - "statistical findings with specific numbers"
+      - "trend directions with supporting data points"
+      - "anomalies and outliers with context"
+      - "correlations between metrics"
+      - "data sources and their reliability"
+    discard:
+      - "hypotheses that were disproven"
+      - "intermediate calculation steps"
+      - "routine data refresh operations"
+      - "personal reminders and spam"
+      - "operational tasks unrelated to analysis"
+    precis_style: "research finding — lead with conclusion, cite data points"
+  plan_template:
+    categories: [research, analysis, reporting, data]
+    max_items: 8
+    review_frequency: 2

@@ -1,0 +1,124 @@
+// Generated using r++ skill: spec-to-rpp (v0.5)
+// Purpose: Score relevance (R) of a memory node for an autonomous agent
+
+TARGET {
+  output: "Relevance score for a new memory node in an autonomous agent's memory system"
+  lang: JSON
+  profile: data
+}
+
+TOKENS {
+  minScore: 0.0 | maxScore: 1.0
+  boostAmount: 0.15 | boostCap: 0.84
+}
+
+FORMAT {
+  fmtScore(n) => n.toFixed(2)
+}
+
+MAP {
+  SCORE_BAND {
+    critical: 0.85-1.0
+    | important: 0.65-0.84
+    | relevant: 0.40-0.64
+    | routine: 0.15-0.39
+    | noise: 0.0-0.14
+  }
+  BAND_EXAMPLES {
+    critical: "bankruptcy, major client signed, significant revenue loss, funding raised"
+    | important: "new product launched, key hire, pricing change, quarterly results"
+    | relevant: "revenue trending up, customer feedback, marketing metrics with numbers"
+    | routine: "blog post published, meeting scheduled, minor task completed"
+    | noise: "checked email nothing found, personal reminders, spam, small talk"
+  }
+}
+
+RUNTIME_INPUTS EXACT:
+| field          | type     | source                              |
+|----------------|----------|-------------------------------------|
+| memory_content | string   | raw text of the new memory to score |
+| preserve_rules | string[] | from @compression.preserve config   |
+| discard_rules  | string[] | from @compression.discard config    |
+| agent_role     | string   | agent's role description             |
+
+INIT {
+  base_score     = 0.0
+  preserve_boost = 0.0
+  final_score    = base_score + preserve_boost
+}
+
+STRUCTURE {
+  ScoringPipeline: sequence
+    DiscardCheck
+    BaseScore
+    PreserveBoost
+    Clamp
+    Output
+}
+
+COMPONENT DiscardCheck {
+  // First gate — discard rules override everything
+  compare memory_content against each discard_rule
+  if ANY discard_rule matches → set base_score BETWEEN 0.05 and 0.14
+  if ANY discard_rule matches → skip BaseScore and PreserveBoost
+}
+
+COMPONENT BaseScore {
+  // Score based on strategic impact to the agent's role
+  // Use MAP.BAND_EXAMPLES as reference for each band
+  critical 0.85-1.0: agent's strategy would change because of this event
+  important 0.65-0.84: meaningful business event that informs decisions
+  relevant 0.40-0.64: useful context that adds understanding
+  routine 0.15-0.39: operational event with no strategic value
+  noise 0.0-0.14: no value to the agent's role
+}
+
+COMPONENT PreserveBoost {
+  // Preserve rules boost but do not force a high score
+  // A preserve match means the content CONTAINS a detail type worth keeping
+  // It does NOT mean the memory itself is important
+  if ANY preserve_rule matches AND base_score BELOW 0.65 → add TOKENS.boostAmount
+  if ANY preserve_rule matches AND base_score AT LEAST 0.65 → no boost
+  preserve_boost MUST NOT push final_score above TOKENS.boostCap
+}
+
+COMPONENT Clamp {
+  final_score = clamp(base_score + preserve_boost, TOKENS.minScore, TOKENS.maxScore)
+}
+
+COMPONENT Output {
+  score: final_score as float
+  band: MAP.SCORE_BAND key matching final_score
+  justification: one sentence referencing the band example or matched rule
+  matched_preserve: list of preserve_rules that matched memory_content
+  matched_discard: list of discard_rules that matched memory_content
+}
+
+BEHAVIOR {
+  MUST process DiscardCheck BEFORE BaseScore
+  MUST process BaseScore BEFORE PreserveBoost
+  MUST NOT override a discard match for any reason
+  MUST NOT score routine admin tasks (password changes, backups, config updates) above 0.39
+  MUST NOT score personal reminders, spam, or small talk above 0.14
+  MUST NOT let a preserve_rule match alone push score above TOKENS.boostCap
+  MUST score events involving loss of money, bankruptcy, or default AT LEAST 0.85
+  MUST score events involving new revenue contracts or major client wins AT LEAST 0.85
+  MUST score events involving specific revenue figures AT LEAST 0.40
+  MUST NOT score hiring or team changes above 0.64 UNLESS the hire is a C-level or strategic role
+  MUST NOT score blog posts or social media metrics above 0.39 UNLESS they show exceptional results
+  MUST return EXACTLY one JSON object matching COMPONENT Output
+  MUST NOT include any text outside the JSON object
+}
+
+CHECKLIST {
+  [ ] Score MUST be a float between TOKENS.minScore and TOKENS.maxScore
+  [ ] Score MUST fall within EXACTLY one MAP.SCORE_BAND range
+  [ ] Discard matches MUST result in score 0.05-0.14 with no exceptions
+  [ ] Preserve matches MUST NOT set score above TOKENS.boostCap
+  [ ] Routine admin tasks MUST score 0.15-0.39
+  [ ] Personal reminders and spam MUST score 0.0-0.14
+  [ ] Justification MUST be EXACTLY one sentence
+  [ ] Justification MUST reference a MAP.BAND_EXAMPLES entry or a specific matched rule
+  [ ] Output MUST be valid JSON with EXACTLY these keys: score, band, justification, matched_preserve, matched_discard
+  [ ] matched_preserve and matched_discard MUST ONLY contain rules from the provided lists
+}
